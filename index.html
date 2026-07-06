@@ -7,8 +7,77 @@
 <title>Adil Iqbal — Junior MERN Stack Developer</title>
 <meta name="description" content="Adil Iqbal — Junior MERN Stack Developer from Karachi, Pakistan. React JS, Next.js, Node, MongoDB.">
 <link rel="stylesheet" href="style.css">
+<style>
+#preloader{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  background:#0a0a0f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+#preloader.hide{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.loader-box{
+  width:min(420px,86vw);
+  padding:30px 32px;
+  border:1px solid rgba(217,181,107,0.25);
+  border-radius:10px;
+  background:rgba(255,255,255,0.03);
+}
+.loader-dots{display:flex;gap:8px;margin-bottom:18px;}
+.loader-dots span{width:11px;height:11px;border-radius:50%;display:inline-block;}
+.loader-dots span:nth-child(1){background:#ea6a95;}
+.loader-dots span:nth-child(2){background:#d9b56b;}
+.loader-dots span:nth-child(3){background:#49d3c7;}
+.loader-code{
+  min-height:70px;
+  font-family:monospace;
+  font-size:0.92rem;
+  color:#d9b56b;
+  white-space:pre-wrap;
+  line-height:1.6;
+}
+.loader-code .type-cursor{
+  display:inline-block;
+  width:8px;
+  background:#49d3c7;
+  animation:blink 0.8s steps(1) infinite;
+  margin-left:2px;
+}
+@keyframes blink{50%{opacity:0;}}
+.loader-bar{
+  margin-top:20px;
+  height:3px;
+  width:100%;
+  background:rgba(255,255,255,0.08);
+  border-radius:2px;
+  overflow:hidden;
+}
+.loader-bar-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#d9b56b,#49d3c7);
+  transition:width .3s ease;
+}
+</style>
 </head>
 <body id="top">
+  <div id="preloader">
+    <div class="loader-box">
+      <div class="loader-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="loader-code" id="loaderCode"></div>
+      <div class="loader-bar"><div class="loader-bar-fill" id="loaderFill"></div></div>
+    </div>
+  </div>
+
 <div class="mesh"></div>
 <div class="noise"></div>
 
@@ -212,5 +281,65 @@
 </footer>
 
 <script src="script.js"></script>
+<script>
+(function(){
+  const codeEl = document.getElementById('loaderCode');
+  const fillEl = document.getElementById('loaderFill');
+  const preloader = document.getElementById('preloader');
+  if(!codeEl || !preloader) return;
+
+  const lines = [
+    'const developer = "Adil Iqbal";',
+    'stack.load(["React","Next JS","Tailwind Css"]);',
+    'status: "Ready to build..."'
+  ];
+
+  let lineIndex = 0, charIndex = 0, output = '';
+
+  function typeLine(){
+    if(lineIndex >= lines.length){
+      finishLoading();
+      return;
+    }
+    const currentLine = lines[lineIndex];
+    if(charIndex < currentLine.length){
+      output += currentLine[charIndex];
+      codeEl.innerHTML = output + '<span class="type-cursor">&nbsp;</span>';
+      charIndex++;
+      const totalChars = lines.join('').length;
+      const doneChars = lineIndex * 0;
+      let progressChars = 0;
+      for(let i=0;i<lineIndex;i++){ progressChars += lines[i].length; }
+      progressChars += charIndex;
+      fillEl.style.width = Math.min(95, (progressChars / totalChars) * 100) + '%';
+      setTimeout(typeLine, 28);
+    } else {
+      output += '\n';
+      lineIndex++;
+      charIndex = 0;
+      setTimeout(typeLine, 250);
+    }
+  }
+
+  function finishLoading(){
+    fillEl.style.width = '100%';
+    setTimeout(function(){
+      preloader.classList.add('hide');
+      document.body.style.overflow = '';
+    }, 400);
+  }
+
+  document.body.style.overflow = 'hidden';
+  setTimeout(typeLine, 300);
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      if(!preloader.classList.contains('hide')){
+        finishLoading();
+      }
+    }, 2500);
+  });
+})();
+</script>
 </body>
 </html>
